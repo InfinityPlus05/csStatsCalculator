@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Jenna's CS Stat Calculator</title>
+  <link href="style.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.js" integrity="sha512-VW8/i4IZkHxdD8OlqNdF7fGn3ba0+lYqag+Uy4cG6BtJ/LIr8t23s/vls70pQ41UasHH0tL57GQfKDApqc9izA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/decimal.js/9.0.0/decimal.min.js" integrity="sha512-zPQm8HS4Phjo9pUbbk+HPH3rSWu5H03NFvBpPf6D9EU2xasj0ZxhYAc/lvv/HVDWMSE1Autj19i6nZOfiVQbFQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> 
+   <script>
+    function twoPropZTest(sampSucc1, sampSucc2, sampSize1, sampSize2, prop) {
+      var observedProportion1 = sampSucc1 / sampSize1;
+      var observedProportion2 = sampSucc2 / sampSize2;
+      console.log(observedProportion1);
+      console.log(observedProportion2);
+      var pooledProportion = (sampSucc1 + sampSucc2)/(sampSize1 + sampSize2);
+      console.log(pooledProportion);
+      var testZ = (observedProportion1 - observedProportion2) / math.sqrt((pooledProportion*(1 - pooledProportion)*((1/sampSize1)+(1/sampSize2))));
+      console.log(testZ);
+      var x = GetpValueFromZ(testZ, prop);
+        var result = document.getElementById("result");
+        result.textContent = "P-value: " + x.toFixed(4);
+    }
+function GetpValueFromZ(_z, type = "0") //thx stack overflow
+{
+    if(_z < -14)
+    {
+        _z = -14
+    }
+    else if(_z > 14)
+    {
+        _z = 14
+    }
+    Decimal.set({precision: 100});
+
+    let z = new Decimal(_z);
+    var sum = new Decimal(0);
+
+    var term = new Decimal(1);
+    var k = new Decimal(0);
+
+    var loopstop = new Decimal("10E-50");
+    var minusone = new Decimal(-1);
+    var two = new Decimal(2);
+
+    let pi = new Decimal("3.141592653589793238462643383279502884197169399375105820974944592307816406286208998628034825342117067982148086513282306647")
+
+    while(term.abs().greaterThan(loopstop)) 
+    {
+        term = new Decimal(1)
+    
+        for (let i = 1; i <= k; i++) {
+            term = term.times(z).times(z.dividedBy(two.times(i)))
+        }
+    
+        term = term.times(minusone.toPower(k)).dividedBy(k.times(2).plus(1))        
+        sum = sum.plus(term);
+        k = k.plus(1);
+    }
+    
+    sum = sum.times(z).dividedBy(two.times(pi).sqrt()).plus(0.5);
+
+    if(sum.lessThan(0))
+        sum = sum.abs();
+    else if(sum.greaterThan(1))
+        sum = two.minus(sum);
+
+    switch (type) {
+        case "1": //left
+            return parseFloat(sum.toExponential(40));
+        case "2": //right
+            return parseFloat((new Decimal(1).minus(sum)).toExponential(40));
+        case "0": //twoside
+            return sum.lessThan(0.5)? parseFloat(sum.times(two).toExponential(40)) : parseFloat((new Decimal(1).minus(sum).times(two)).toExponential(40))
+        
+    }
+
+}
+    function getRadioValue() {
+  var ele = document.getElementsByName('prop');
+  for (var i = 0; i < ele.length; i++) {
+    if (ele[i].checked) {
+      return ele[i].value;
+    }
+  }
+}
+</script>
+<img src="smell.png" alt="Jenna's Cool Stats Calculator">
+  <p><strong>2-Prop Z Test</strong></p>
+  <label for="sampSucc1">Sample 1's number of successes:</label>
+
+<input type="text" id="sampSucc1" name="sampSucc1"  placeholder="0" size="1">
+<br>
+  <label for="sampSucc2">Sample 2's number of successes:</label>
+
+<input type="text" id="sampSucc2" name="sampSucc2"  placeholder="0" size="1">
+<br>
+  <label for="sampSize1">Sample 1's number of trials:</label>
+
+<input type="text" id="sampSize1" name="sampSize1"  placeholder="0" size="1">
+<br>
+<label for="sampSize2">Sample 2's number of trials:</label>
+
+<input type="text" id="sampSize2" name="sampSize2"  placeholder="0" size="1">
+<br>
+    <p>Relation to Null Hypothesis:</p>
+   <input type="radio" id="prop1" name="prop" value="0">
+  <label for="age1">Not Equal to Null Hypothesis</label><br>
+  <input type="radio" id="prop2" name="prop" value="1">
+  <label for="age2">Less than Null Hypothesis</label><br>  
+  <input type="radio" id="prop3" name="prop" value="2">
+  <label for="age3">Greater than Null Hypothesis</label><br><br>
+
+  <button onclick="twoPropZTest(document.getElementById('sampSucc1').value, document.getElementById('sampSucc2').value, document.getElementById('sampSize1').value, document.getElementById('sampSize2').value, getRadioValue())">Run Test</button>
+  <br><br><br>
+  <p id="result" style="color:green;
+                            font-size: 20px;
+                            font-weight: bold">
+  </p>
+ 
+  <p>More Tests</p>
+  <p><a href="index.html">1-Prop Z Test</a></p>
+  <p><a href="ttest.html">T-Test</a></p>
+  <p><a href="2sampttest.html">2 Samp T-Test</a></p>

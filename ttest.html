@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Jenna's CS Stat Calculator</title>
+  <link href="style.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.js" integrity="sha512-VW8/i4IZkHxdD8OlqNdF7fGn3ba0+lYqag+Uy4cG6BtJ/LIr8t23s/vls70pQ41UasHH0tL57GQfKDApqc9izA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/decimal.js/9.0.0/decimal.min.js" integrity="sha512-zPQm8HS4Phjo9pUbbk+HPH3rSWu5H03NFvBpPf6D9EU2xasj0ZxhYAc/lvv/HVDWMSE1Autj19i6nZOfiVQbFQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jstat/1.9.6/jstat.min.js" integrity="sha512-UK8MjH09aePxFAd8OwI5P4oP462OBBNGVh3OtnuHjybd0T3ArUbAseIuHpS1XfinmMXcCZG5barC+7SNPjuQtg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+   <script>
+    function tTest(sampleMean, populationMean, Sx, size, prop) {
+      var testT = (sampleMean-populationMean)/(Sx / Math.sqrt(size));
+      console.log(testT);
+      var x = GetpValueFromT(testT, size, prop);
+      var result = document.getElementById("result");
+      result.textContent = "P-value: " + x.toFixed(4);
+    }
+function GetpValueFromT(t, size, type = "0") //thx stack overflow
+{
+   var df = size - 1;
+   var t = Math.abs(t);
+   var p_value = 1 - jStat.studentt.cdf(t,df);
+   switch (type) {
+        case "1": //left
+            return p_value
+        case "2": //right
+            return 1- p_value
+        case "0": //twoside
+            return 2 * p_value
+   }   
+
+}
+    function getRadioValue() {
+  var ele = document.getElementsByName('prop');
+  for (var i = 0; i < ele.length; i++) {
+    if (ele[i].checked) {
+      return ele[i].value;
+    }
+  }
+}
+</script>
+<img src="smell.png" alt="Jenna's Cool Stats Calculator">
+  <p><strong>T Test</strong></p>
+  <label for="sampleMean">Sample Mean:</label>
+
+<input type="text" id="sampleMean" name="sampleMean"  placeholder="0" size="1">
+<br>
+  <label for="populationMean">Population Mean:</label>
+
+<input type="text" id="populationMean" name="populationMean"  placeholder="0" size="1">
+<br>
+  <label for="Sx">Standard Deviation:</label>
+
+<input type="text" id="Sx" name="Sx"  placeholder="0" size="1">
+<br>
+  <label for="size">Sample Size:</label>
+
+<input type="text" id="size" name="size"  placeholder="0" size="1">
+  
+<br>
+    <p>Relation to Null Hypothesis:</p>
+   <input type="radio" id="prop1" name="prop" value="0">
+  <label for="age1">Not Equal to Null Hypothesis</label><br>
+  <input type="radio" id="prop2" name="prop" value="1">
+  <label for="age2">Less than Null Hypothesis</label><br>  
+  <input type="radio" id="prop3" name="prop" value="2">
+  <label for="age3">Greater than Null Hypothesis</label><br><br>
+
+  <button onclick="tTest(document.getElementById('sampleMean').value, document.getElementById('populationMean').value, document.getElementById('Sx').value, document.getElementById('size').value, getRadioValue())">Run Test</button>
+  <br><br><br>
+  <p id="result" style="color:green;
+                            font-size: 20px;
+                            font-weight: bold">
+  </p>
+  <p>More Tests</p>
+  <p><a href="index.html">1-Prop Z Test</a></p>
+  <p><a href="2propztest.html">2-Prop Z Test</a></p>
+  <p><a href="2sampttest.html">2 Samp T-Test</a></p>
